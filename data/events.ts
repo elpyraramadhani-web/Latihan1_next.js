@@ -70,7 +70,19 @@ export const events: Event[] = [
     kuota: 60,
     terisi: 18,
   },
+  {
+    id: 7,
+    judul: "Pertunjukan Teater Sekolah",
+    kategori: "Teater",
+    tanggal: "2026-12-15",
+    lokasi: "Aula",
+    harga: 20000,
+    kuota: 100,
+    terisi: 100,
+  },
 ];
+
+
 
 export function rupiah(n: number){
     return n == 0 ? "Gratis" : "Rp. " + n.toLocaleString('id-ID')
