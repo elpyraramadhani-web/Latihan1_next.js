@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {rupiah, type Event } from "@/data/events";
 
-export default function kartuEvent({event}: {event:Event}) {
+export default function KartuEvent({event}: {event: Event})  {
     const sisa = event.kuota - event.terisi;
     return (
         <div className="rounded-xl border bg-white p-4 shadow-sm">
