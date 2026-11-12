@@ -1,6 +1,8 @@
 "use server"
+import { revalidatePath } from "next/cache";
 import { events } from "@/data/events";
-import { tambahPesanan } from "@/data/pesanan";
+import { pesanan, tambahPesanan } from "@/data/pesanan";
+import { cookies } from "next/headers";
 
 export type HasilPesan = {
     berhasil: boolean;
@@ -49,10 +51,32 @@ export async function pesanTiket(_sebelum: HasilPesan, formData: FormData): Prom
         waktu: new Date().toLocaleString("id-ID"),
     });
 
+    const toples = await cookies();
+    toples.set("nama", nama, {maxAge: 60 * 60 *24 * 30});
+
+    revalidatePath("/event");
+    revalidatePath(`/event/${eventId}`);
+    revalidatePath("/pesanan")
     return {
         berhasil: true,
         pesan: `Pesanan #${nomor} tersimpan: ${jumlah} tiket untuk ${nama}.`,
         galat: {},
         isian: { nama, email: "" },
     };
+    }
+
+    export async function batalkanPesanan(fromData : FormData){
+        const nomor = Number(fromData.get("nomor"));
+        const namaSaya =  (await cookies()).get("nama")?.value
+        const i = pesanan.findIndex((p) => p.nomor === nomor);
+        // jangan percaya browser: periksa lagi di server bahwa ini pesanan miliknya
+        if (i === -1 || pesanan[i].nama !== namaSaya) return;
+
+        const [batal] = pesanan.splice(i, 1);
+        const event = events.find((e) => e.id === batal.eventId);
+        if (event) event.terisi -= batal.jumlah
+
+        revalidatePath("/event");
+        revalidatePath(`/event/${batal.eventId}`);
+        revalidatePath("/pesanan")
     }
