@@ -1,23 +1,21 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import {events, rupiah} from "@/data/events";
 import FormPesan from "@/components/FromPesan";
 import TombolFavorit from "@/components/TombolFavorit";
-import Link from "next/link"; 
 import { cookies } from "next/headers";
-
+import { rupiah } from "@/data/events";
+import { ambilEvent } from "@/data/ambil";
+import EventTerkait from "@/components/EventTerkait";
 
 export default async function Detail({params}: PageProps<"/event/[id]">) {
     const { id } = await params;
-    const event = events.find((e) => e.id === Number(id));
+    const event = await ambilEvent(Number(id));
     if (!event) notFound();
     
     const sisa = event.kuota - event.terisi;
 
     const namaAwal = (await cookies()).get("nama")?.value ?? "";
 
-     const terkait = events.filter(
-        (e) => e.kategori === event.kategori && e.id !== event.id
-    );
 
     return (
         <article className="rounded-xl border bg-white p-6">
@@ -36,22 +34,9 @@ export default async function Detail({params}: PageProps<"/event/[id]">) {
         <FormPesan event={event} namaAwal={namaAwal} />
         <section className="mt-8">
             <h2 className="mb-2 text-xl font-semibold">Event terkait</h2>
-            {terkait.length === 0 ? (
-            <p className="text-slate-500">Belum ada event terkait.</p>
-            ) : (
-            <ul className="list-disc pl-5">
-                {terkait.map((e) => (
-                <li key={e.id}>
-                    <Link
-                    href={`/event/${e.id}`}
-                    className="text-blue-600 hover:underline"
-                    >
-                    {e.judul}
-                    </Link>
-                </li>
-                ))}
-            </ul>
-            )}
+            <Suspense fallback={<p className="text-slate-400">Memuat event terkait...</p>}>
+                <EventTerkait event={event} />
+            </Suspense>
         </section>
         </article>
     );

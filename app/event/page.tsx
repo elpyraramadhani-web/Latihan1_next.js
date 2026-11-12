@@ -1,7 +1,8 @@
-import {events} from "@/data/events";
 import KatalogInteraktif from "@/components/KatalogInteraktif";
+import { ambilEvents } from "@/data/ambil";
 
-export default function Katalog() {
+export default async function Katalog() {
+    const events = await ambilEvents();
     return (
         <div>
         <h1 className="mb-4 text-2xl font-bold"> Katalog Event</h1>
