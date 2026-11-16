@@ -1,4 +1,7 @@
 import DaftarFavorit from "@/components/DaftarFavorit";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Favorit" };
 
 export default function Favorit() {
     return (
