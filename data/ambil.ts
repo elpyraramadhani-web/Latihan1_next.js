@@ -1,6 +1,7 @@
 import type { Event } from "@/data/events";
 import { supabase } from "@/lib/supabase";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import type { Pesanan } from "@/data/pesanan";
 
 export async function ambilEvents(): Promise<Event[]> {
     const { data, error } = await supabase.from("events").select("*").order("tanggal");
@@ -39,6 +40,16 @@ export async function hitungPesanan(
 
   const tiket = data.reduce((total, p) => total + p.jumlah, 0);
   return { pesanan: data.length, tiket };
+}
+
+export async function ambilPesanan(): Promise<Pesanan[]> {
+  const {data, error} = await supabaseAdmin
+  .from("pesanan")
+  .select("*, events(judul)")
+  .order("nomor", {ascending: false });
+  if(error) throw new Error("Gagal memuat pesanan: " + error.message);
+  return data as Pesanan[];
+  
 }
 
 //.eq("id", id) artinya hanya ambil baris yang kolom id-nya sama dengan nilai id
